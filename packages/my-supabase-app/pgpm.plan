@@ -1,0 +1,6 @@
+%syntax-version=1.0.0
+%project=my-supabase-app
+%uri=my-supabase-app
+
+pets_app 2017-08-11T08:11:51Z constructive <constructive@5b0c196eeb62> # add pets_app
+rls_pets [pets_app] 2017-08-11T08:11:51Z constructive <constructive@5b0c196eeb62> # add rls_pets
