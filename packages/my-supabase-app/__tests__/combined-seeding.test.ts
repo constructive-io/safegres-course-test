@@ -9,6 +9,7 @@ let db: PgTestClient;
 let teardown: () => Promise<void>;
 
 const user1Id = '550e8400-e29b-41d4-a716-446655440001';
+const user2Id = '550e8400-e29b-41d4-a716-446655440002';
 
 beforeAll(async () => {
   ({ pg, db, teardown } = await getConnections());

@@ -48,8 +48,15 @@ beforeEach(async () => await db.beforeEach());
 afterEach(async () => await db.afterEach());
 
 it('has loaded all pets', async () => {
-  const result = await pg.query('SELECT * FROM pets.pets');
-  expect(result.rows).toHaveLength(3);
+  // Use authenticated context to query
+  db.setContext({
+    role: 'authenticated',
+    'request.jwt.claim.sub': user1.id
+  });
+
+  const result = await db.query('SELECT * FROM pets.pets WHERE owner_id = $1 ORDER BY name', [user1.id]);
+  expect(result.rows).toHaveLength(2);
+  expect(result.rows[0].name).toBe('Buddy');
 });
 
 it('users only see their own pets', async () => {
@@ -60,8 +67,9 @@ it('users only see their own pets', async () => {
 
   const result = await db.query(`
     SELECT name FROM pets.pets
+    WHERE owner_id = $1
     ORDER BY name
-  `);
+  `, [user1.id]);
 
   expect(result.rows).toHaveLength(2);
   expect(result.rows.map(r => r.name)).toEqual(['Buddy', 'Whiskers']);

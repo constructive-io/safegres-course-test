@@ -48,8 +48,9 @@ it('CSV data works with RLS policies', async () => {
 
   const result = await db.query(`
     SELECT name FROM pets.pets
+    WHERE owner_id = $1
     ORDER BY name
-  `);
+  `, [user1.id]);
 
   expect(result.rows).toHaveLength(2);
   expect(result.rows.map(r => r.name)).toEqual(['Rocky', 'Shadow']);

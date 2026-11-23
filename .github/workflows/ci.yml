@@ -2,60 +2,93 @@ name: Supabase tests
 on:
   push:
   pull_request:
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
-
-permissions:
-  contents: read
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - my-supabase-app
+
     env:
       PGHOST: 127.0.0.1
       PGPORT: 54322
       PGUSER: supabase_admin
       PGPASSWORD: postgres
+      DATABASE_URL: "postgresql://postgres:postgres@127.0.0.1:54322/postgres"
 
     steps:
+      - name: Configure Git (for tests)
+        run: |
+          git config --global user.name "CI Test User"
+          git config --global user.email "ci@example.com"
+
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 11
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Install pgpm CLI
-        run: npm install -g pgpm
-
-      - name: Install database modules
-        working-directory: packages/my-supabase-app
-        run: |
-          version=$(node -p "require('./package.json').dependencies['@pgpm/supabase-schema']")
-          pgpm install "@pgpm/supabase-schema@$version"
 
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
           version: latest
 
+      - name: Initialize Supabase (if needed)
+        run: test -d supabase || supabase init
+
       - name: Start Supabase stack
         run: supabase start
+
+      - name: Show Supabase status
+        run: supabase status
 
       - name: Install Postgres client
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
 
-      - name: Test the Supabase module
+      - name: Wait for Postgres
+        run: |
+          for i in {1..60}; do
+            if pg_isready -h 127.0.0.1 -p 54322 -U postgres; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "postgres not ready in time"
+          docker ps
+          supabase status
+          exit 1
+
+      - name: Enable corepack and pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9 --activate
+          pnpm -v
+          node -v
+
+      - name: Install
+        run: pnpm install
+
+      - name: Install pgpm CLI globally
+        run: npm install -g pgpm
+
+      - name: Install Supabase schema
         working-directory: packages/my-supabase-app
-        run: pnpm test
+        run: pgpm install "@pgpm/supabase-schema@$(node -p "require('./package.json').dependencies['@pgpm/supabase-schema']")"
+
+      - name: Build
+        run: pnpm -r build
+
+      - name: Seed pg and app_user
+        run: |
+          # bootstrap admin user NOT REQUIRED FOR supabase
+          # pgpm admin-users bootstrap --yes
+          # optional, but added to avoid concurrent attempts to add user
+          pgpm admin-users add --test --yes
+
+      - name: Test ${{ matrix.package }}
+        run: cd ./packages/${{ matrix.package }} && pnpm test

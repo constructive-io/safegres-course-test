@@ -41,7 +41,7 @@ beforeEach(async () => { await db.beforeEach(); });
 afterEach(async () => { await db.afterEach(); });
 
 
-it('should allow a user to create a pet they own', async () => {
+it('should allow user to create their own user record', async () => {
   // set context to simulate authenticated user
   db.setContext({
     role: 'authenticated',
@@ -77,17 +77,21 @@ it('should prevent user1 from updating user2\'s record', async () => {
 
   expect(pet.owner_id).toBe(user2.id);
 
-  // RLS hides user2's pet from user1, so the update affects no rows.
+  // user1 tries to update user2's pet - should throw
   db.setContext({
     role: 'authenticated',
     'request.jwt.claim.sub': user1.id
   });
 
-  const result = await db.query(
-    'UPDATE pets.pets SET name = $1 WHERE id = $2',
-    ['New Name', pet.id]
-  );
-  expect(result.rowCount).toBe(0);
+  await expect(
+    db.one(
+      `UPDATE pets.pets 
+         SET name = $1 
+         WHERE id = $2 
+         RETURNING id, name, breed, owner_id`,
+      ['Hacked Name', pet.id]
+    )
+  ).rejects.toThrow();
 });
 
 it('should allow users to see only their own data in list queries', async () => {
@@ -97,7 +101,7 @@ it('should allow users to see only their own data in list queries', async () => 
     'request.jwt.claim.sub': user1.id
   });
 
-  // Each user inserts a pet in their own context.
+  // create multiple users as admin
   await db.one(
     `INSERT INTO pets.pets (name, breed, owner_id) 
        VALUES ($1, $2, $3) 
@@ -105,7 +109,7 @@ it('should allow users to see only their own data in list queries', async () => 
     ['Fido', 'Labrador', user1.id]
   );
 
-  // set context to user2
+  // set context to user1
   db.setContext({
     role: 'authenticated',
     'request.jwt.claim.sub': user2.id
@@ -118,7 +122,7 @@ it('should allow users to see only their own data in list queries', async () => 
     ['Buddy', 'Golden Retriever', user2.id]
   );
 
-  // set context to user3
+  // set context to user1
   db.setContext({
     role: 'authenticated',
     'request.jwt.claim.sub': user3.id
