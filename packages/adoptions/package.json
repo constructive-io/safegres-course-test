@@ -1,0 +1,29 @@
+{
+  "name": "adoptions",
+  "version": "0.0.1",
+  "author": "Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>",
+  "description": "adoptions",
+  "homepage": "https://github.com/ada/my-database-project",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ada/my-database-project"
+  },
+  "bugs": {
+    "url": "https://github.com/ada/my-database-project/issues"
+  },
+  "scripts": {
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watchAll"
+  },
+  "keywords": [],
+  "devDependencies": {
+    "pgsql-test": "^5.9.7",
+    "makage": "^0.5.1"
+  }
+}

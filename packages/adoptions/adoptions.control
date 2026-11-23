@@ -1,0 +1,7 @@
+# adoptions extension
+comment = 'adoptions extension'
+default_version = '0.0.1'
+module_pathname = '$libdir/adoptions'
+requires = 'pets'
+relocatable = false
+superuser = false
