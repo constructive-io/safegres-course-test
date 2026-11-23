@@ -1,4 +1,4 @@
-CREATE FUNCTION document_ids()
+CREATE FUNCTION app_public.document_ids()
 RETURNS SETOF integer
 LANGUAGE sql
 AS $$
