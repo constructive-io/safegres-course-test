@@ -1,0 +1,10 @@
+{
+  "packages": [
+    "packages/*",
+    "extensions/*"
+  ],
+  "engine": "pglite",
+  "boilerplates": {
+    "repo": "https://github.com/constructive-io/pglite-boilerplates.git"
+  }
+}

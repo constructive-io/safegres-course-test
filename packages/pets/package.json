@@ -1,0 +1,32 @@
+{
+  "name": "pets",
+  "version": "0.0.1",
+  "author": "Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>",
+  "description": "pets",
+  "homepage": "https://github.com/ada/my-pglite-project",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ada/my-pglite-project"
+  },
+  "bugs": {
+    "url": "https://github.com/ada/my-pglite-project/issues"
+  },
+  "scripts": {
+    "lint": "eslint . --fix",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watchAll"
+  },
+  "keywords": [],
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.4",
+    "@electric-sql/pglite-pgvector": "^0.0.18",
+    "@pgpmjs/pglite-adapter": "^1.10.7",
+    "makage": "^0.5.1",
+    "pglite-test": "^1.9.7"
+  }
+}

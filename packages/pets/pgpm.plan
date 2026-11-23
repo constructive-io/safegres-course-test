@@ -1,0 +1,7 @@
+%syntax-version=1.0.0
+%project=pets
+%uri=pets
+
+pets_table 2017-08-11T08:11:51Z constructive <constructive@5b0c196eeb62> # add pets_table
+pets_rls [pets_table] 2017-08-11T08:11:51Z constructive <constructive@5b0c196eeb62> # add pets_rls
+documents_table 2017-08-11T08:11:51Z constructive <constructive@5b0c196eeb62> # add documents_table

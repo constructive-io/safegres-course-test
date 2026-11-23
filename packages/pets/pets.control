@@ -1,0 +1,7 @@
+# pets extension
+comment = 'pets extension'
+default_version = '0.0.1'
+module_pathname = '$libdir/pets'
+requires = 'vector'
+relocatable = false
+superuser = false
