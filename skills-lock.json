@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "skills": {
+    "safegres": {
+      "source": "constructive-io/constructive",
+      "commit": "a9ce8c3f314192813d5c986c28060a48387b8406",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/safegres/SKILL.md",
+      "computedHash": "9c2f27b5ab0a999fe177338f51e35267875410d1e5de3df14edfda411d9feb65"
+    }
+  }
+}

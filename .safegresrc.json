@@ -1,0 +1,30 @@
+{
+  "extends": [
+    "safegres:recommended",
+    "./safegres-preset.json"
+  ],
+  "exposure": {
+    "schemas": [
+      "app_public"
+    ],
+    "roles": [
+      "app_reader"
+    ],
+    "planes": [
+      {
+        "name": "direct:app_reader",
+        "kind": "role",
+        "roles": [
+          "app_reader"
+        ]
+      },
+      {
+        "name": "internal",
+        "kind": "schema",
+        "schemas": [
+          "app_private"
+        ]
+      }
+    ]
+  }
+}

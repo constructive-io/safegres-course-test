@@ -1,0 +1,6 @@
+{
+	"extends": "./.safegresrc.json",
+	"perf": { "enabled": true, "baseline": "ci/safegres-perf-baseline.json", "failOnNew": true },
+	"failOn": { "grade": "B" },
+	"outputs": { "dir": "safegres-reports", "sarifSources": "migrations" }
+}
