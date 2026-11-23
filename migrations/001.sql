@@ -17,4 +17,3 @@ CREATE TABLE app_public.child (
   id integer PRIMARY KEY,
   document_id integer REFERENCES app_public.documents (id)
 );
-CREATE INDEX child_document_id_idx ON app_public.child (document_id);
