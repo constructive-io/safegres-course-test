@@ -1,0 +1,34 @@
+{
+  "name": "pets",
+  "version": "0.0.1",
+  "author": "Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>",
+  "description": "pets",
+  "homepage": "https://github.com/ada/my-database-project",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ada/my-database-project"
+  },
+  "bugs": {
+    "url": "https://github.com/ada/my-database-project/issues"
+  },
+  "scripts": {
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watchAll"
+  },
+  "keywords": [],
+  "devDependencies": {
+    "drizzle-orm-test": "^3.18.11",
+    "makage": "^0.5.1",
+    "pgsql-test": "^5.9.7"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.4",
+    "pg": "^8.23.1"
+  }
+}
