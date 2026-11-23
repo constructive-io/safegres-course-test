@@ -1,9 +1,9 @@
 name: Database audit
 on:
   pull_request:
-    branches: [main]
+    branches: [feat/safegres-pgpm-ci-base]
   push:
-    branches: [main]
+    branches: [feat/safegres-pgpm-ci-base]
 
 jobs:
   audit:
@@ -13,20 +13,19 @@ jobs:
       actions: read
     services:
       postgres:
-        image: postgres:16
+        image: constructiveio/postgres-plus:18
         env:
-          POSTGRES_DB: app_audit
           POSTGRES_PASSWORD: ci-only
         ports: ['5432:5432']
         options: >-
-          --health-cmd "pg_isready -U postgres -d app_audit"
+          --health-cmd "pg_isready -U postgres"
           --health-interval 5s --health-timeout 5s --health-retries 10
     env:
       PGHOST: 127.0.0.1
       PGPORT: 5432
       PGUSER: postgres
       PGPASSWORD: ci-only
-      PGDATABASE: app_audit
+      PGDATABASE: postgres
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,10 +33,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: npm ci
-      - run: psql -X -v ON_ERROR_STOP=1 -f migrations/001.sql
-      - uses: constructive-io/constructive/packages/safegres@608acc891de5197ad3cb4bfd0babe1050dbec24a
+      - run: npm install -g pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec pgpm admin-users bootstrap --yes
+      - uses: constructive-io/constructive/packages/safegres@safegres-action-v1
         with:
           version: local
-          config: safegres.audit.json
           report-only: true

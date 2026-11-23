@@ -1,1 +1,6 @@
-{ "rules": { "C1": "high", "C3": "low" } }
+{
+	"rules": {
+		"C1": "high",
+		"C3": "low"
+	}
+}

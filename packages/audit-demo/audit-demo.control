@@ -1,0 +1,6 @@
+# audit-demo extension
+comment = 'audit-demo extension'
+default_version = '0.0.1'
+module_pathname = '$libdir/audit-demo'
+relocatable = false
+superuser = false
