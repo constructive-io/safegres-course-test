@@ -1,17 +1,17 @@
 {
-  "name": "lab",
+  "name": "sql-lint",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint:sql": "node lint-sql.mjs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "@pgsql/lint": "^18.3.13",
-    "safegres": "1.30.14"
+    "@pgsql/lint": "^18.3.13"
   }
 }
