@@ -29,12 +29,12 @@ beforeAll(async () => {
   });
 });
 
-afterAll(async () => await teardown?.());
+afterAll(async () => await teardown());
 beforeEach(async () => await db.beforeEach());
-afterEach(async () => await db?.afterEach());
+afterEach(async () => await db.afterEach());
 
 it('combines SQL and JSON seeding', async () => {
-  db.setContext({ role: 'anonymous', 'jwt.claims.user_id': null });
+  db.setContext({ role: 'anonymous' });
 
   const result = await db.query(`
     SELECT * FROM pets.pets

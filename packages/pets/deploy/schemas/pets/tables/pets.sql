@@ -1,4 +1,4 @@
--- Deploy: schemas/pets/tables/pets
+-- Deploy schemas/pets/tables/pets
 -- requires: schemas/pets
 
 CREATE TABLE pets.pets (

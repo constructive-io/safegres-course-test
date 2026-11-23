@@ -1,3 +1,3 @@
--- Deploy: schemas/pets
+-- Deploy schemas/pets
 
 CREATE SCHEMA pets;

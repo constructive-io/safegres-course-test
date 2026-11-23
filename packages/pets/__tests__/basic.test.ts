@@ -8,7 +8,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await teardown?.();
+  await teardown();
 });
 
 beforeEach(async () => {
@@ -16,7 +16,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  await pg?.afterEach();
+  await pg.afterEach();
 });
 
 it('can insert and query pets', async () => {

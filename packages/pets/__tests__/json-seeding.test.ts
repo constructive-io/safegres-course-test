@@ -38,19 +38,19 @@ beforeAll(async () => {
   });
 });
 
-afterAll(async () => await teardown?.());
+afterAll(async () => await teardown());
 beforeEach(async () => await db.beforeEach());
-afterEach(async () => await db?.afterEach());
+afterEach(async () => await db.afterEach());
 
 it('has loaded all pets', async () => {
-  db.setContext({ role: 'anonymous', 'jwt.claims.user_id': null });
+  db.setContext({ role: 'anonymous' });
 
   const result = await db.query('SELECT * FROM pets.pets ORDER BY name');
   expect(result.rows).toHaveLength(3);
   expect(result.rows[0].name).toBe('Buddy');
 });
 
-it('filters the public fixture by Alice’s owner ID', async () => {
+it('alice sees her pets', async () => {
   db.setContext({
     role: 'authenticated',
     'jwt.claims.user_id': alice

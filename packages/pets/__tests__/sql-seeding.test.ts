@@ -17,18 +17,18 @@ beforeAll(async () => {
   ]);
 });
 
-afterAll(async () => await teardown?.());
+afterAll(async () => await teardown());
 beforeEach(async () => await db.beforeEach());
-afterEach(async () => await db?.afterEach());
+afterEach(async () => await db.afterEach());
 
 it('loads fixtures from SQL file', async () => {
-  db.setContext({ role: 'anonymous', 'jwt.claims.user_id': null });
+  db.setContext({ role: 'anonymous' });
 
   const result = await db.query('SELECT * FROM pets.pets ORDER BY name');
   expect(result.rows).toHaveLength(5);
 });
 
-it('counts Alice’s seeded pets by species', async () => {
+it('supports complex queries on seeded data', async () => {
   db.setContext({
     role: 'authenticated',
     'jwt.claims.user_id': alice

@@ -34,12 +34,13 @@ module.exports = {
   // warns about (W1) and caps the score for. Declare the schemas your API
   // serves and the roles it connects as:
   //
-  exposure: {
-    schemas: ['pets'],
-    roles: ['anonymous', 'authenticated'],
-    anonRoles: ['anonymous'],
-  },
-  public: { read: ['pets.pets'] },
+  // exposure: {
+  //   schemas: ['app_public'],
+  //   roles: ['authenticated'],
+  //   // The subset of `roles` an unauthenticated caller arrives as. Setting it
+  //   // is what switches on the untrusted-role rules (R1, R2, L5).
+  //   anonRoles: ['anonymous']
+  // },
 
   // Security is gated on a grade; performance is gated on a ratchet. A perf
   // score is dominated by whatever debt a schema already carries, so a

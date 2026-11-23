@@ -19,27 +19,22 @@ GRANT USAGE ON SCHEMA pets TO authenticated;
 GRANT SELECT ON TABLE pets.pets TO anonymous;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE pets.pets TO authenticated;
 
--- Policy: Both application roles can view all pets
+-- Policy: Anyone can view all pets
 CREATE POLICY pets_select_all ON pets.pets
   FOR SELECT
-  TO anonymous, authenticated
   USING (true);
 
 -- Policy: Users can only insert pets they own
 CREATE POLICY pets_insert_own ON pets.pets
   FOR INSERT
-  TO authenticated
-  WITH CHECK (owner_id = (SELECT NULLIF(current_setting('jwt.claims.user_id', true), '')::UUID));
+  WITH CHECK (owner_id = (SELECT current_setting('jwt.claims.user_id', true)::UUID));
 
 -- Policy: Users can only update their own pets
 CREATE POLICY pets_update_own ON pets.pets
   FOR UPDATE
-  TO authenticated
-  USING (owner_id = (SELECT NULLIF(current_setting('jwt.claims.user_id', true), '')::UUID))
-  WITH CHECK (owner_id = (SELECT NULLIF(current_setting('jwt.claims.user_id', true), '')::UUID));
+  USING (owner_id = (SELECT current_setting('jwt.claims.user_id', true)::UUID));
 
 -- Policy: Users can only delete their own pets
 CREATE POLICY pets_delete_own ON pets.pets
   FOR DELETE
-  TO authenticated
-  USING (owner_id = (SELECT NULLIF(current_setting('jwt.claims.user_id', true), '')::UUID));
+  USING (owner_id = (SELECT current_setting('jwt.claims.user_id', true)::UUID));

@@ -10,7 +10,7 @@ beforeAll(async () => {
   ({ pg, db, teardown } = await getConnections());
 });
 
-afterAll(async () => await teardown?.());
+afterAll(async () => await teardown());
 
 beforeEach(async () => {
   await db.beforeEach();
@@ -28,7 +28,7 @@ beforeEach(async () => {
   });
 });
 
-afterEach(async () => await db?.afterEach());
+afterEach(async () => await db.afterEach());
 
 it('scenario 1 - can modify seeded data', async () => {
   db.setContext({

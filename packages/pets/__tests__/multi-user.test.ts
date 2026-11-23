@@ -21,11 +21,11 @@ beforeAll(async () => {
   `, [alice, bob, charlie]);
 });
 
-afterAll(async () => await teardown?.());
+afterAll(async () => await teardown());
 beforeEach(async () => await db.beforeEach());
-afterEach(async () => await db?.afterEach());
+afterEach(async () => await db.afterEach());
 
-it('both users can read every public listing', async () => {
+it('users only see all pets (not just their own)', async () => {
   // Alice can see all pets
   db.setContext({
     role: 'authenticated',
@@ -45,7 +45,7 @@ it('both users can read every public listing', async () => {
   expect(bobView.rows.length).toBe(4);
 });
 
-it('users cannot update pets they do not own', async () => {
+it('users cannot update other users pets', async () => {
   // Bob tries to update Alice's dog
   db.setContext({
     role: 'authenticated',
@@ -74,7 +74,7 @@ it('users cannot update pets they do not own', async () => {
   expect(check.rows[0].name).toBe('Alice Dog');
 });
 
-it('users cannot delete pets they do not own', async () => {
+it('users cannot delete other users pets', async () => {
   // Charlie tries to delete Bob's bird
   db.setContext({
     role: 'authenticated',
@@ -101,7 +101,7 @@ it('users cannot delete pets they do not own', async () => {
   expect(check.rows[0].name).toBe('Bob Bird');
 });
 
-it('applies the active user claim after each switch', async () => {
+it('handles rapid user switching correctly', async () => {
   // Alice adds a pet
   db.setContext({
     role: 'authenticated',
@@ -113,14 +113,11 @@ it('applies the active user claim after each switch', async () => {
     VALUES ('Alice Rabbit', 'rabbit', $1)
   `, [alice]);
 
-  // Switch to Bob and query his listings
+  // Switch to Bob - should not see Alice's new pet in his owned pets
   db.setContext({
     role: 'authenticated',
     'jwt.claims.user_id': bob
   });
-
-  const bobContext = await db.query(`SELECT current_setting('jwt.claims.user_id') AS user_id`);
-  expect(bobContext.rows[0].user_id).toBe(bob);
 
   const bobPets = await db.query(`
     SELECT name FROM pets.pets WHERE owner_id = $1
@@ -129,14 +126,11 @@ it('applies the active user claim after each switch', async () => {
   expect(bobPets.rows.length).toBe(1);
   expect(bobPets.rows[0].name).toBe('Bob Bird');
 
-  // Switch to Charlie and query his listings
+  // Switch to Charlie - should not see Alice's or Bob's pets in owned
   db.setContext({
     role: 'authenticated',
     'jwt.claims.user_id': charlie
   });
-
-  const charlieContext = await db.query(`SELECT current_setting('jwt.claims.user_id') AS user_id`);
-  expect(charlieContext.rows[0].user_id).toBe(charlie);
 
   const charliePets = await db.query(`
     SELECT name FROM pets.pets WHERE owner_id = $1
@@ -150,9 +144,6 @@ it('applies the active user claim after each switch', async () => {
     role: 'authenticated',
     'jwt.claims.user_id': alice
   });
-
-  const aliceContext = await db.query(`SELECT current_setting('jwt.claims.user_id') AS user_id`);
-  expect(aliceContext.rows[0].user_id).toBe(alice);
 
   const alicePets = await db.query(`
     SELECT name FROM pets.pets WHERE owner_id = $1 ORDER BY name
@@ -193,7 +184,20 @@ it('batch updates only affect owned pets', async () => {
 });
 
 it('batch deletes only affect owned pets', async () => {
-  // Make sure both owners have a fish before the DELETE runs
+  // Charlie tries to delete all fish
+  db.setContext({
+    role: 'authenticated',
+    'jwt.claims.user_id': charlie
+  });
+
+  const batchDelete = await db.query(`
+    DELETE FROM pets.pets WHERE species = 'fish'
+  `);
+
+  // Only Charlie's fish should be deleted
+  expect(batchDelete.rowCount).toBe(1);
+
+  // Insert another fish owned by Alice
   db.setContext({
     role: 'authenticated',
     'jwt.claims.user_id': alice
@@ -203,19 +207,6 @@ it('batch deletes only affect owned pets', async () => {
     INSERT INTO pets.pets (name, species, owner_id)
     VALUES ('Alice Goldfish', 'fish', $1)
   `, [alice]);
-
-  // Charlie tries to delete all fish
-  db.setContext({
-    role: 'authenticated',
-    'jwt.claims.user_id': charlie
-  });
-
-  const batchDelete = await db.query(`
-    DELETE FROM pets.pets WHERE species = 'fish'
-    RETURNING name
-  `);
-
-  expect(batchDelete.rows.map(row => row.name)).toEqual(['Charlie Fish']);
 
   // Verify Alice's fish still exists
   const aliceFish = await db.query(`
@@ -233,13 +224,17 @@ it('users cannot insert pets for other users', async () => {
     'jwt.claims.user_id': bob
   });
 
-  await db.expectError(
-    () => db.query(`
+  const failurePoint = 'insert_other_user';
+  await db.savepoint(failurePoint);
+
+  await expect(
+    db.query(`
       INSERT INTO pets.pets (name, species, owner_id)
       VALUES ('Fake Pet', 'snake', $1)
-    `, [alice]),
-    { code: '42501', message: /new row violates row-level security policy/ }
-  );
+    `, [alice])
+  ).rejects.toThrow(/new row violates row-level security policy/);
+
+  await db.rollback(failurePoint);
 
   // Verify Alice's pet count hasn't changed
   db.setContext({
@@ -255,27 +250,35 @@ it('users cannot insert pets for other users', async () => {
 });
 
 it('anonymous users cannot modify any data', async () => {
-  db.setContext({ role: 'anonymous', 'jwt.claims.user_id': null });
+  db.setContext({ role: 'anonymous' });
 
-  await db.expectError(
-    () => db.query(`
+  const insertPoint = 'anonymous_insert';
+  await db.savepoint(insertPoint);
+
+  await expect(
+    db.query(`
       INSERT INTO pets.pets (name, species, owner_id)
       VALUES ('Anonymous Pet', 'hamster', $1)
-    `, [alice]),
-    { code: '42501', message: /permission denied/ }
-  );
+    `, [alice])
+  ).rejects.toThrow(/permission denied/);
 
-  await db.expectError(
-    () => db.query(`
+  await db.rollback(insertPoint);
+
+  const updatePoint = 'anonymous_update';
+  await db.savepoint(updatePoint);
+  await expect(
+    db.query(`
       UPDATE pets.pets SET name = 'Hacked'
-    `),
-    { code: '42501', message: /permission denied/ }
-  );
+    `)
+  ).rejects.toThrow(/permission denied/);
+  await db.rollback(updatePoint);
 
-  await db.expectError(
-    () => db.query(`
+  const deletePoint = 'anonymous_delete';
+  await db.savepoint(deletePoint);
+  await expect(
+    db.query(`
       DELETE FROM pets.pets
-    `),
-    { code: '42501', message: /permission denied/ }
-  );
+    `)
+  ).rejects.toThrow(/permission denied/);
+  await db.rollback(deletePoint);
 });

@@ -16,19 +16,19 @@ beforeAll(async () => {
   });
 });
 
-afterAll(async () => await teardown?.());
+afterAll(async () => await teardown());
 beforeEach(async () => await db.beforeEach());
-afterEach(async () => await db?.afterEach());
+afterEach(async () => await db.afterEach());
 
 it('loads CSV data correctly', async () => {
-  db.setContext({ role: 'anonymous', 'jwt.claims.user_id': null });
+  db.setContext({ role: 'anonymous' });
 
   const result = await db.query('SELECT * FROM pets.pets ORDER BY name');
   expect(result.rows).toHaveLength(4);
   expect(result.rows[0].name).toBe('Bubbles');
 });
 
-it('finds Alice’s two listings in the CSV fixture', async () => {
+it('CSV data respects schema constraints', async () => {
   db.setContext({
     role: 'authenticated',
     'jwt.claims.user_id': alice

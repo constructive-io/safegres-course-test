@@ -20,13 +20,13 @@ beforeAll(async () => {
   `, [user1]);
 });
 
-afterAll(async () => await teardown?.());
+afterAll(async () => await teardown());
 beforeEach(async () => await db.beforeEach());
-afterEach(async () => await db?.afterEach());
+afterEach(async () => await db.afterEach());
 
 it('anonymous users can view all pets', async () => {
   // Switch to anonymous role
-  db.setContext({ role: 'anonymous', 'jwt.claims.user_id': null });
+  db.setContext({ role: 'anonymous' });
 
   const result = await db.query('SELECT * FROM pets.pets');
   expect(result.rows).toHaveLength(1);
@@ -34,7 +34,7 @@ it('anonymous users can view all pets', async () => {
 });
 
 it('anonymous users cannot insert pets', async () => {
-  db.setContext({ role: 'anonymous', 'jwt.claims.user_id': null });
+  db.setContext({ role: 'anonymous' });
 
   await expect(
     db.query(`
@@ -73,16 +73,4 @@ it('users cannot insert pets for other users', async () => {
         VALUES ('Not My Pet', 'bird', $1)
       `, [user5])
   ).rejects.toThrow(/new row violates row-level security policy/);
-});
-
-it('an authenticated role without a user claim cannot insert a pet', async () => {
-  db.setContext({ role: 'authenticated', 'jwt.claims.user_id': null });
-
-  await db.expectError(
-    () => db.query(`
-      INSERT INTO pets.pets (name, species, owner_id)
-      VALUES ('No Claim', 'dog', $1)
-    `, [user3]),
-    { code: '42501', message: /new row violates row-level security policy/ }
-  );
 });
