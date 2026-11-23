@@ -12,3 +12,8 @@ CREATE TABLE app_private.import_queue (id integer PRIMARY KEY);
 
 GRANT USAGE ON SCHEMA app_public, app_private TO app_reader;
 GRANT SELECT ON app_public.documents, app_private.import_queue TO app_reader;
+
+CREATE TABLE app_public.child (
+  id integer PRIMARY KEY,
+  document_id integer REFERENCES app_public.documents (id)
+);
