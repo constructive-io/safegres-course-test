@@ -1,4 +1,29 @@
 {
   "version": 1,
-  "findings": []
+  "findings": [
+    {
+      "code": "X8",
+      "schema": "adoptions",
+      "table": "adoption_history",
+      "subject": "event_date"
+    },
+    {
+      "code": "X8",
+      "schema": "adoptions",
+      "table": "adoptions",
+      "subject": "adoption_date"
+    },
+    {
+      "code": "X8",
+      "schema": "adoptions",
+      "table": "adoptions",
+      "subject": "created_at"
+    },
+    {
+      "code": "X8",
+      "schema": "pets",
+      "table": "pets",
+      "subject": "created_at"
+    }
+  ]
 }

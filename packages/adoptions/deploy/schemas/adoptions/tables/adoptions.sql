@@ -7,3 +7,5 @@ CREATE TABLE adoptions.adoptions (
   adoption_date DATE DEFAULT CURRENT_DATE,
   created_at TIMESTAMPTZ DEFAULT now()
 );
+
+CREATE INDEX ON adoptions.adoptions (pet_id);

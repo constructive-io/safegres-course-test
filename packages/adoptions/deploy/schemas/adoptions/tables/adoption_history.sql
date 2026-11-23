@@ -7,3 +7,5 @@ CREATE TABLE adoptions.adoption_history (
   event_type TEXT NOT NULL,
   event_date TIMESTAMPTZ DEFAULT now()
 );
+
+CREATE INDEX ON adoptions.adoption_history (pet_id);
