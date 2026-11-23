@@ -1,0 +1,61 @@
+name: Supabase tests
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      PGHOST: 127.0.0.1
+      PGPORT: 54322
+      PGUSER: supabase_admin
+      PGPASSWORD: postgres
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install pgpm CLI
+        run: npm install -g pgpm
+
+      - name: Install database modules
+        working-directory: packages/my-supabase-app
+        run: |
+          version=$(node -p "require('./package.json').dependencies['@pgpm/supabase-schema']")
+          pgpm install "@pgpm/supabase-schema@$version"
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start Supabase stack
+        run: supabase start
+
+      - name: Install Postgres client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Test the Supabase module
+        working-directory: packages/my-supabase-app
+        run: pnpm test

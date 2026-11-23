@@ -1,0 +1,7 @@
+# my-supabase-app extension
+comment = 'my-supabase-app extension'
+default_version = '0.0.1'
+module_pathname = '$libdir/my-supabase-app'
+requires = 'supabase-schema'
+relocatable = false
+superuser = false

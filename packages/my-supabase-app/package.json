@@ -1,0 +1,33 @@
+{
+  "name": "my-supabase-app",
+  "version": "0.0.1",
+  "author": "Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>",
+  "description": "my-supabase-app",
+  "homepage": "https://github.com/ada/my-supabase-project",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ada/my-supabase-project"
+  },
+  "bugs": {
+    "url": "https://github.com/ada/my-supabase-project/issues"
+  },
+  "scripts": {
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watchAll"
+  },
+  "keywords": [],
+  "dependencies": {
+    "@pgpm/supabase-schema": "0.6.1"
+  },
+  "devDependencies": {
+    "makage": "^0.5.1",
+    "pgsql-test": "^5.9.7",
+    "supabase-test": "^3.18.11"
+  }
+}
