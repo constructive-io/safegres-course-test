@@ -23,12 +23,12 @@
   },
   "keywords": [],
   "devDependencies": {
-    "drizzle-orm-test": "^3.18.11",
+    "drizzle-kit": "^0.31.11",
     "makage": "^0.5.1",
     "pgsql-test": "^5.9.7"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.4",
-    "pg": "^8.23.1"
+    "drizzle-orm-test": "^3.18.11"
   }
 }

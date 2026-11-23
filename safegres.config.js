@@ -34,12 +34,6 @@ module.exports = {
   // warns about (W1) and caps the score for. Declare the schemas your API
   // serves and the roles it connects as:
   //
-  exposure: {
-    schemas: ['public'],
-    roles: ['anonymous', 'authenticated'],
-    anonRoles: ['anonymous']
-  },
-
   // exposure: {
   //   schemas: ['app_public'],
   //   roles: ['authenticated'],

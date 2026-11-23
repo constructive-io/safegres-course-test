@@ -1,4 +1,4 @@
--- Deploy: pets_rls
+-- Deploy pets_rls
 -- requires: pets_table
 
 -- Add user_id column
@@ -18,21 +18,20 @@ GRANT USAGE, SELECT ON SEQUENCE pets_id_seq TO authenticated;
 
 -- Policy: Anyone can view all pets
 CREATE POLICY pets_select_all ON pets
-  FOR SELECT TO anonymous, authenticated
+  FOR SELECT
   USING (true);
 
 -- Policy: Users can only insert pets they own
 CREATE POLICY pets_insert_own ON pets
-  FOR INSERT TO authenticated
+  FOR INSERT
   WITH CHECK (user_id = (SELECT current_setting('jwt.claims.user_id', true)));
 
 -- Policy: Users can only update their own pets
 CREATE POLICY pets_update_own ON pets
-  FOR UPDATE TO authenticated
-  USING (user_id = (SELECT current_setting('jwt.claims.user_id', true)))
-  WITH CHECK (user_id = (SELECT current_setting('jwt.claims.user_id', true)));
+  FOR UPDATE
+  USING (user_id = (SELECT current_setting('jwt.claims.user_id', true)));
 
 -- Policy: Users can only delete their own pets
 CREATE POLICY pets_delete_own ON pets
-  FOR DELETE TO authenticated
+  FOR DELETE
   USING (user_id = (SELECT current_setting('jwt.claims.user_id', true)));

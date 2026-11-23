@@ -6,7 +6,7 @@ on:
   push:
     branches:
       - main
-      - course-verification
+      - drizzle-course-verification
   workflow_dispatch:
 
 jobs:
