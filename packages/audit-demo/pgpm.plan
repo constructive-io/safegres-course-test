@@ -3,3 +3,4 @@
 %uri=audit-demo
 
 create-documents 2017-08-11T08:11:51Z constructive <constructive@5b0c196eeb62> # add create-documents
+restrict-import-queue [create-documents] 2017-08-11T08:11:51Z constructive <constructive@5b0c196eeb62> # add restrict-import-queue
